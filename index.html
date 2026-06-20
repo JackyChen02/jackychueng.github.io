@@ -6,7 +6,7 @@
   │    新人 / 日期 / 酒店 / 导航链接 / 电话 / 配图                 │
   │    foods：美食，按 group 分组，每组 items 里 {name, desc}     │
   │            加一项就在对应 items 里加 {name:'…', desc:'…'}     │
-  │  上传时：index.html + couple.jpg + map.png 一起传。          │
+  │  图片已用云端地址，部署时只需 index.html 一个文件。         │
   └─────────────────────────────────────────────────────────────┘
 -->
 <html lang="zh-CN">
@@ -136,6 +136,12 @@
   .foodmap{margin:0 0 22px}
   .foodmap img{width:100%;display:block;border-radius:12px;border:1px solid var(--line);box-shadow:var(--shadow)}
   .foodmap .cap{font-family:var(--serif);text-align:center;color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:8px}
+  .getabout{margin:0 0 24px}
+  .ga-h{font-family:var(--serif);color:var(--accent);font-size:13px;letter-spacing:.16em;text-indent:.16em;margin-bottom:10px;text-align:center}
+  .ga-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .ga-card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 6px;text-align:center}
+  .ga-card .m{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink)}
+  .ga-card .n{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
   .fgroup + .fgroup{margin-top:24px}
   .fgroup-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px;
     font-family:var(--serif);color:var(--accent);font-size:16px;font-weight:600;letter-spacing:.08em}
@@ -187,7 +193,7 @@
       <span class="wk" id="weekday"></span><span id="date"></span>
       <div class="ln" id="lunar"></div>
     </div>
-    <p class="intro">谢谢你愿意为我们跑这一趟。这页备了来北流的路径和本地的美食。住宿不用操心，已经给你安排好啦～</p>
+    <p class="intro">谢谢你愿意为我们跑这一趟。这页备了来北流的路线和本地的美食。住宿不用操心，已经给你安排好啦～</p>
   </header>
 
   <!-- ===== 配图 ===== -->
@@ -222,9 +228,9 @@
     <!-- 出行面板 -->
     <div class="mpanel on" id="m-travel" role="tabpanel">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true"  data-tab="plane">飞 机</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="train">动 车</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="bus">汽 车</button>
+        <button class="tab" role="tab" aria-selected="true"  data-tab="plane">✈️飞 机</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="train">🚄动 车</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="bus">🚗汽 车</button>
       </div>
 
       <div class="panel on" id="plane" role="tabpanel">
@@ -239,7 +245,7 @@
           <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M847.9 592H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h605.2L612.9 851c-4.1 5.2-.4 13 6.3 13h72.5c4.9 0 9.5-2.2 12.6-6.1l168.8-214.1c16.5-21 1.6-51.8-25.2-51.8zM872 356H266.8l144.3-183c4.1-5.2.4-13-6.3-13h-72.5c-4.9 0-9.5 2.2-12.6 6.1L150.9 380.2c-16.5 21-1.6 51.8 25.1 51.8h696c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/></svg></div>
           <div>
             <b>错峰中转，顺道逛逛广西</b>
-            <p>赶不上直飞就中转，还能顺路玩一玩：飞南宁吃碗老友粉、飞桂林看「山水甲天下」、飞北海踩踩银滩，再转高铁或大巴到北流。中转班次多、好挑时间。</p>
+            <p>赶不上直飞就中转，还能顺路玩一玩：飞南宁吃碗老友粉、飞桂林看「山水甲天下」、飞北海踩踩银滩，再转高铁或大巴到北流。中转班次多、好挑时间，路线详见【动车】篇</p>
           </div>
         </div>
       </div>
@@ -249,7 +255,7 @@
           <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M854.6 289.1a362.49 362.49 0 00-79.9-115.7 370.83 370.83 0 00-118.2-77.8C610.7 76.6 562.1 67 512 67c-50.1 0-98.7 9.6-144.5 28.5-44.3 18.3-84 44.5-118.2 77.8A363.6 363.6 0 00169.4 289c-19.5 45-29.4 92.8-29.4 142 0 70.6 16.9 140.9 50.1 208.7 26.7 54.5 64 107.6 111 158.1 80.3 86.2 164.5 138.9 188.4 153a43.9 43.9 0 0022.4 6.1c7.8 0 15.5-2 22.4-6.1 23.9-14.1 108.1-66.8 188.4-153 47-50.4 84.3-103.6 111-158.1C867.1 572 884 501.8 884 431.1c0-49.2-9.9-97-29.4-142zM512 880.2c-65.9-41.9-300-207.8-300-449.1 0-77.9 31.1-151.1 87.6-206.3C356.3 169.5 431.7 139 512 139s155.7 30.5 212.4 85.9C780.9 280 812 353.2 812 431.1c0 241.3-234.1 407.2-300 449.1zm0-617.2c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 01512 551c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 01400 439c0-29.9 11.7-58 32.8-79.2C454 338.6 482.1 327 512 327c29.9 0 58 11.6 79.2 32.8C612.4 381 624 409.1 624 439c0 29.9-11.6 58-32.8 79.2z"/></svg></div>
           <div>
             <b>高铁买到「玉林北」</b>
-            <p>南玉高铁已通车，南宁到玉林约一小时。外省出发大多要在南宁东换乘一次。</p>
+            <p>南玉高铁已通车，南宁东到玉林约一小时。外省高铁出发大多要在南宁东换乘一次。</p>
           </div>
         </div>
         <div class="route">
@@ -278,6 +284,14 @@
         <img id="foodMapImg" alt="北流美食地图">
         <figcaption class="cap">美食地图 · 点击放大</figcaption>
       </figure>
+      <div class="getabout">
+        <div class="ga-h">觅食方式</div>
+        <div class="ga-grid">
+          <div class="ga-card"><div class="m">走路</div><div class="n">店多集中，好溜达，北流不大</div></div>
+          <div class="ga-card"><div class="m">打车</div><div class="n">凉快，但容易堵车</div></div>
+          <div class="ga-card"><div class="m">共享电瓶车</div><div class="n">扫码即走，最灵活</div></div>
+        </div>
+      </div>
       <div id="foodList"></div>
     </div>
   </section>
@@ -293,7 +307,7 @@
   </section>
 
   <footer class="reveal">
-    <div class="bye">路上注意安全，等你来北流喝喜酒。</div>
+    <div class="bye">路上注意安全，等你来北流吃席。</div>
     <div class="sig" id="sig"></div>
   </footer>
 </div>
@@ -320,8 +334,8 @@
     amapUrl: 'https://surl.amap.com/25NnBOZ1A0Ht',
     baiduUrl:'https://map.baidu.com/poi/%E5%8C%97%E6%B5%81%E5%9B%BD%E9%99%85%E5%A4%A7%E9%85%92%E5%BA%97(%E4%B8%87%E8%BE%BE%E5%B9%BF%E5%9C%BA%E5%BA%97)/@12284678.04,2580707.16,19z?uid=d63dfa3ae94c383fabf0cd72&ugc_type=3&ugc_ver=1&device_ratio=1&compat=1&en_uid=d63dfa3ae94c383fabf0cd72&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl',
     phone:   '18701832058',
-    photo:   'couple.jpg',
-    foodMap: 'map.png',          // 美食地图，与本网页同一文件夹；没有就自动隐藏
+    photo:   'https://env-00jy6g1ft960-static.normal.cloudstatic.cn/couple.jpg',
+    foodMap: 'https://env-00jy6g1ft960-static.normal.cloudstatic.cn/71cb720eda1edc67bc7b2bb00efc4f11.jpg',
     // 美食：按 group 分组，每组 items 里放 {name, desc}；desc 留空就只显示名字
     foods: [
       {
@@ -338,7 +352,7 @@
           { name:'洪记臭豆腐', desc:'' },
           { name:'吴记鸡爪', desc:'薄荷鸡爪很独特。' },
           { name:'瓦屋凉茶', desc:'体验广西凉茶，就在吴记鸡爪旁边。吃不了苦就别喝凉茶，点甜的雷公根加奶。' },
-          { name:'百草堂', desc:'陵宁路。西米露加奶，从小喝到大。' },
+          { name:'百草堂', desc:'陵宁路。香芋西米露加奶，从小喝到大。' },
           { name:'圭江桥头豆腐花', desc:'' }
         ]
       },
