@@ -4,10 +4,9 @@
   │  使用说明（宾客看不到，只有你编辑时能看到）                    │
   │  改下面 <script> 里 CONFIG：                                  │
   │    新人 / 日期 / 酒店 / 导航链接 / 电话 / 配图                 │
-  │    foods：美食推荐数组，{name 菜名, tag 标签, desc 一句话}    │
-  │            想加菜就在数组里加一项；tag 留空就不显示           │
-  │  ★ 美食待替换为你们的真实合集 ★                              │
-  │  上传时：index.html + 照片(couple.jpg) 一起传。              │
+  │    foods：美食，按 group 分组，每组 items 里 {name, desc}     │
+  │            加一项就在对应 items 里加 {name:'…', desc:'…'}     │
+  │  上传时：index.html + couple.jpg + map.png 一起传。          │
   └─────────────────────────────────────────────────────────────┘
 -->
 <html lang="zh-CN">
@@ -122,23 +121,30 @@
   .route{display:flex;gap:14px;padding:14px 0}
   .route + .route{border-top:1px solid var(--line-soft)}
   .route .mk{
-    flex:0 0 25px;width:25px;height:25px;border-radius:50%;border:1.5px solid var(--accent);
-    color:var(--accent-deep);background:var(--card);font-family:var(--serif);font-size:13px;font-weight:600;
+    flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--accent);
+    color:var(--accent-deep);background:var(--card);
     display:flex;align-items:center;justify-content:center;margin-top:1px;
   }
+  .route .mk svg{width:13px;height:13px;fill:currentColor;display:block}
+  .route .mk.mk-send svg{transform:translate(1.5px,-.5px)} /* 纸飞机光学居中 */
   .route b{font-size:15px;font-weight:600}
   .route p{font-size:13.5px;color:var(--ink-soft);margin-top:3px;line-height:1.75}
   .note{margin:14px 0 4px;font-size:13px;color:var(--ink-soft);line-height:1.8;background:#f3ede1;border-left:2px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 13px}
   .note span{color:var(--accent);font-weight:600;margin-right:.5em}
 
   /* ---------- 美食 ---------- */
-  .food{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:0 4px 14px rgba(42,37,32,.04)}
-  .food + .food{margin-top:11px}
-  .food-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-  .food-name{font-family:var(--serif);font-size:16.5px;font-weight:600;letter-spacing:.03em}
-  .food-tag{flex:0 0 auto;font-size:11.5px;color:var(--accent);background:var(--accent-tint);padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
-  .food-desc{font-size:13.5px;color:var(--ink-soft);margin-top:6px;line-height:1.7}
-  .foodnote{margin-top:14px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.7}
+  .foodmap{margin:0 0 22px}
+  .foodmap img{width:100%;display:block;border-radius:12px;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .foodmap .cap{font-family:var(--serif);text-align:center;color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:8px}
+  .fgroup + .fgroup{margin-top:24px}
+  .fgroup-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px;
+    font-family:var(--serif);color:var(--accent);font-size:16px;font-weight:600;letter-spacing:.08em}
+  .fgroup-h .gn{font-family:var(--sans);font-size:11.5px;color:var(--muted);font-weight:400;letter-spacing:.02em}
+  .fitem{padding:12px 2px}
+  .fitem + .fitem{border-top:1px solid var(--line-soft)}
+  .fitem .nm{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+  .fitem .ds{font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.7}
+  .foodnote{margin-top:18px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.7}
 
   /* ---------- 联系 ---------- */
   .contact{text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:var(--shadow)}
@@ -156,6 +162,17 @@
   /* ---------- Toast ---------- */
   #toast{position:fixed;left:50%;bottom:calc(34px + env(safe-area-inset-bottom));transform:translate(-50%,18px);background:var(--ink);color:#fdf6e9;padding:11px 22px;border-radius:999px;font-size:13.5px;letter-spacing:.04em;opacity:0;pointer-events:none;transition:all .26s cubic-bezier(.16,1,.3,1);z-index:50;box-shadow:0 10px 28px rgba(0,0,0,.24)}
   #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- 图片点击放大 ---------- */
+  .figure img,.foodmap img{cursor:zoom-in}
+  #lightbox{position:fixed;inset:0;z-index:100;display:none;background:rgba(20,16,14,.94)}
+  #lightbox.open{display:block}
+  #lightbox .lb-scroll{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center;padding:20px}
+  #lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;cursor:zoom-in;user-select:none}
+  #lightbox.zoomed .lb-scroll{display:block}
+  #lightbox.zoomed img{max-width:none;max-height:none;width:175%;border-radius:0;cursor:zoom-out}
+  #lbClose{position:fixed;top:calc(12px + env(safe-area-inset-top));right:16px;z-index:101;width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:24px;line-height:38px;text-align:center;cursor:pointer;padding:0}
+  #lbClose:active{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -212,63 +229,56 @@
 
       <div class="panel on" id="plane" role="tabpanel">
         <div class="route">
-          <div class="mk">甲</div>
+          <div class="mk mk-send"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M931.4 498.9L94.9 79.5c-3.4-1.7-7.3-2.1-11-1.2a15.99 15.99 0 00-11.7 19.3l86.2 352.2c1.3 5.3 5.2 9.6 10.4 11.3l147.7 50.7-147.6 50.7c-5.2 1.8-9.1 6-10.3 11.3L72.2 926.5c-.9 3.7-.5 7.6 1.2 10.9 3.9 7.9 13.5 11.1 21.5 7.2l836.5-417c3.1-1.5 5.6-4.1 7.2-7.1 3.9-8 .7-17.6-7.2-21.6zM170.8 826.3l50.3-205.6 295.2-101.3c2.3-.8 4.2-2.6 5-5 1.4-4.2-.8-8.7-5-10.2L221.1 403 171 198.2l628 314.9-628.2 313.2z"/></svg></div>
           <div>
-            <b>有直飞，飞玉林福绵机场</b>
-            <p>落地打车或网约车到北流国际大酒店，约三四十分钟车程，导航搜上面地址就行。直飞航线不多，订票前先查一下出发城市有没有。</p>
+            <b>上海直飞，飞玉林福绵机场</b>
+            <p>上海直飞玉林只有周二、周四、周六下午这几班，17:00 起飞、20:05 落地。目前国庆当天还是全价 1790，另加约 200 基建燃油，合计约 1990，不急的话可以再蹲蹲低价。落地打车到北流国际大酒店，约一小时。</p>
           </div>
         </div>
         <div class="route">
-          <div class="mk">乙</div>
+          <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M847.9 592H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h605.2L612.9 851c-4.1 5.2-.4 13 6.3 13h72.5c4.9 0 9.5-2.2 12.6-6.1l168.8-214.1c16.5-21 1.6-51.8-25.2-51.8zM872 356H266.8l144.3-183c4.1-5.2.4-13-6.3-13h-72.5c-4.9 0-9.5 2.2-12.6 6.1L150.9 380.2c-16.5 21-1.6 51.8 25.1 51.8h696c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/></svg></div>
           <div>
-            <b>没直飞，飞南宁吴圩机场中转</b>
-            <p>南宁机场坐机场大巴或地铁到南宁东站，换乘南宁到玉林的动车（约一小时）到玉林北站，再打车到酒店，约半小时。这条最稳，班次多。</p>
+            <b>错峰中转，顺道逛逛广西</b>
+            <p>赶不上直飞就中转，还能顺路玩一玩：飞南宁吃碗老友粉、飞桂林看「山水甲天下」、飞北海踩踩银滩，再转高铁或大巴到北流。中转班次多、好挑时间。</p>
           </div>
         </div>
-        <p class="note"><span>提示</span>到了机场先别急着出来，发个定位给我们，帮你看怎么打车最省。</p>
       </div>
 
       <div class="panel" id="train" role="tabpanel">
         <div class="route">
-          <div class="mk">一</div>
+          <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M854.6 289.1a362.49 362.49 0 00-79.9-115.7 370.83 370.83 0 00-118.2-77.8C610.7 76.6 562.1 67 512 67c-50.1 0-98.7 9.6-144.5 28.5-44.3 18.3-84 44.5-118.2 77.8A363.6 363.6 0 00169.4 289c-19.5 45-29.4 92.8-29.4 142 0 70.6 16.9 140.9 50.1 208.7 26.7 54.5 64 107.6 111 158.1 80.3 86.2 164.5 138.9 188.4 153a43.9 43.9 0 0022.4 6.1c7.8 0 15.5-2 22.4-6.1 23.9-14.1 108.1-66.8 188.4-153 47-50.4 84.3-103.6 111-158.1C867.1 572 884 501.8 884 431.1c0-49.2-9.9-97-29.4-142zM512 880.2c-65.9-41.9-300-207.8-300-449.1 0-77.9 31.1-151.1 87.6-206.3C356.3 169.5 431.7 139 512 139s155.7 30.5 212.4 85.9C780.9 280 812 353.2 812 431.1c0 241.3-234.1 407.2-300 449.1zm0-617.2c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 01512 551c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 01400 439c0-29.9 11.7-58 32.8-79.2C454 338.6 482.1 327 512 327c29.9 0 58 11.6 79.2 32.8C612.4 381 624 409.1 624 439c0 29.9-11.6 58-32.8 79.2z"/></svg></div>
           <div>
             <b>高铁买到「玉林北」</b>
-            <p>南玉高铁已通车，南宁到玉林约一小时。外省出发大多要在南宁或南宁东换乘一次。想离酒店更近，也可以坐普速火车买到「北流站」。</p>
+            <p>南玉高铁已通车，南宁到玉林约一小时。外省出发大多要在南宁东换乘一次。</p>
           </div>
         </div>
         <div class="route">
-          <div class="mk">二</div>
+          <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M380 704h264c4.4 0 8-3.6 8-8v-84c0-4.4-3.6-8-8-8h-40c-4.4 0-8 3.6-8 8v36H428v-36c0-4.4-3.6-8-8-8h-40c-4.4 0-8 3.6-8 8v84c0 4.4 3.6 8 8 8zm340-123a40 40 0 1080 0 40 40 0 10-80 0zm239-167.6L935.3 372a8 8 0 00-10.9-2.9l-50.7 29.6-78.3-216.2a63.9 63.9 0 00-60.9-44.4H301.2c-34.7 0-65.5 22.4-76.2 55.5l-74.6 205.2-50.8-29.6a8 8 0 00-10.9 2.9L65 413.4c-2.2 3.8-.9 8.6 2.9 10.8l60.4 35.2-14.5 40c-1.2 3.2-1.8 6.6-1.8 10v348.2c0 15.7 11.8 28.4 26.3 28.4h67.6c12.3 0 23-9.3 25.6-22.3l7.7-37.7h545.6l7.7 37.7c2.7 13 13.3 22.3 25.6 22.3h67.6c14.5 0 26.3-12.7 26.3-28.4V509.4c0-3.4-.6-6.8-1.8-10l-14.5-40 60.3-35.2a8 8 0 003-10.8zM840 517v237H184V517l15.6-43h624.8l15.6 43zM292.7 218.1l.5-1.3.4-1.3c1.1-3.3 4.1-5.5 7.6-5.5h427.6l75.4 208H220l72.7-199.9zM224 581a40 40 0 1080 0 40 40 0 10-80 0z"/></svg></div>
           <div>
             <b>出站打车到北流酒店</b>
-            <p>玉林北站出站口就有出租和网约车，到北流国际大酒店约三四十分钟。直接报「北流国际大酒店」给司机，或用导航。</p>
+            <p>玉林北站出站口打网约车，到北流国际大酒店约三四十分钟。</p>
           </div>
         </div>
-        <p class="note"><span>提示</span>快到站时给我们发个消息，方便的话过去接你。</p>
       </div>
 
       <div class="panel" id="bus" role="tabpanel">
         <div class="route">
-          <div class="mk">一</div>
+          <div class="mk"><svg viewBox="64 64 896 896" aria-hidden="true"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372zm198.4-588.1a32 32 0 00-24.5.5L414.9 415 296.4 686c-3.6 8.2-3.6 17.5 0 25.7 3.4 7.8 9.7 13.9 17.7 17 3.8 1.5 7.7 2.2 11.7 2.2 4.4 0 8.7-.9 12.8-2.7l271-118.6 118.5-271a32.06 32.06 0 00-17.7-42.7zM576.8 534.4l26.2 26.2-42.4 42.4-26.2-26.2L380 644.4 447.5 490 422 464.4l42.4-42.4 25.5 25.5L644.4 380l-67.6 154.4zM464.4 422L422 464.4l25.5 25.6 86.9 86.8 26.2 26.2 42.4-42.4-26.2-26.2-86.8-86.9z"/></svg></div>
           <div>
             <b>自驾</b>
-            <p>导航直接搜「北流国际大酒店」走高速即可，点上面「高德导航」一键开路线。</p>
+            <p>导航直接搜「北流国际大酒店」走高速即可，点上面「高德地图」一键开路线。</p>
           </div>
         </div>
-        <div class="route">
-          <div class="mk">二</div>
-          <div>
-            <b>坐长途大巴</b>
-            <p>买到「北流汽车站」的票最方便，下车打车几分钟到酒店；只有到玉林的车，就到玉林汽车总站再转。夜里大巴到得晚，提前跟我们说一声。</p>
-          </div>
-        </div>
-        <p class="note"><span>提示</span>自驾快到了打个电话，酒店门口我们出来接，免得最后一段绕路。</p>
       </div>
     </div>
 
     <!-- 美食面板 -->
     <div class="mpanel" id="m-food" role="tabpanel">
+      <figure class="foodmap" id="foodMapFig">
+        <img id="foodMapImg" alt="北流美食地图">
+        <figcaption class="cap">美食地图 · 点击放大</figcaption>
+      </figure>
       <div id="foodList"></div>
-      <p class="foodnote">具体哪家最地道，到了问我们，给你指路或带你去。</p>
     </div>
   </section>
 
@@ -286,6 +296,11 @@
     <div class="bye">路上注意安全，等你来北流喝喜酒。</div>
     <div class="sig" id="sig"></div>
   </footer>
+</div>
+
+<div id="lightbox" aria-hidden="true">
+  <button id="lbClose" aria-label="关闭">×</button>
+  <div class="lb-scroll"><img id="lbImg" alt=""></div>
 </div>
 
 <div id="toast"></div>
@@ -306,13 +321,50 @@
     baiduUrl:'https://map.baidu.com/poi/%E5%8C%97%E6%B5%81%E5%9B%BD%E9%99%85%E5%A4%A7%E9%85%92%E5%BA%97(%E4%B8%87%E8%BE%BE%E5%B9%BF%E5%9C%BA%E5%BA%97)/@12284678.04,2580707.16,19z?uid=d63dfa3ae94c383fabf0cd72&ugc_type=3&ugc_ver=1&device_ratio=1&compat=1&en_uid=d63dfa3ae94c383fabf0cd72&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl',
     phone:   '18701832058',
     photo:   'couple.jpg',
-    // ★ 美食待替换为你们的真实合集 ★
+    foodMap: 'map.png',          // 美食地图，与本网页同一文件夹；没有就自动隐藏
+    // 美食：按 group 分组，每组 items 里放 {name, desc}；desc 留空就只显示名字
     foods: [
-      { name:'玉林牛巴',     tag:'招牌', desc:'玉林一带最有名的牛肉小吃，咸香入味、有嚼劲，配米粉或下酒都好。' },
-      { name:'北流卷粉',     tag:'早餐', desc:'本地米制卷粉，皮薄馅足、淋上酱汁，早上街边最常见的一口。' },
-      { name:'玉林牛腩粉',   tag:'粉面', desc:'软烂牛腩盖在米粉上，汤头浓，本地人的日常一碗。' },
-      { name:'桂东南白切鸡', tag:'家常', desc:'皮黄肉嫩，蘸沙姜葱油，广西餐桌上的硬菜。' },
-      { name:'玉林云吞',     tag:'小吃', desc:'皮薄馅大，清汤或干捞都对味。' }
+      {
+        group: '推荐路线',
+        note: '多在新芝路一带，串着吃方便',
+        items: [
+          { name:'真好吃嘉洲盐焗', desc:'新芝路。地址不好搜，搜不到就搜「新芝路千里香嘉洲盐焗」，认准它左边那家。' },
+          { name:'何姨云吞店', desc:'旁边就是九号电动车。' },
+          { name:'标记老友粉', desc:'新芝路。' },
+          { name:'梅姨生料粉', desc:'生料就是猪肉加猪杂。' },
+          { name:'察理王子', desc:'新芝路080。Jacky 最爱柠檬椰果养乐多。' },
+          { name:'肥妈酸料', desc:'' },
+          { name:'第一甜品', desc:'新芝路0052号。整条宵夜街，晚上 7 点后好吃的特别多。' },
+          { name:'洪记臭豆腐', desc:'' },
+          { name:'吴记鸡爪', desc:'薄荷鸡爪很独特。' },
+          { name:'瓦屋凉茶', desc:'体验广西凉茶，就在吴记鸡爪旁边。吃不了苦就别喝凉茶，点甜的雷公根加奶。' },
+          { name:'百草堂', desc:'陵宁路。西米露加奶，从小喝到大。' },
+          { name:'圭江桥头豆腐花', desc:'' }
+        ]
+      },
+      {
+        group: '永丰篇',
+        note: '离酒店有点远',
+        items: [
+          { name:'兄兄云吞', desc:'' },
+          { name:'大维饮品（永丰店）', desc:'北流老奶茶，从高中开到现在，路稍远。' },
+          { name:'陈氏粽子', desc:'一家早餐店。' },
+          { name:'小何同学螺蛳粉', desc:'' }
+        ]
+      },
+      {
+        group: '其他',
+        note: '位置比较分散',
+        items: [
+          { name:'万达广场', desc:'和各地万达没啥区别，就在酒店这边。' },
+          { name:'GoodMe', desc:'上海喝不到。' },
+          { name:'兄兄云吞 / 大兄云吞', desc:'多家连锁，哪家近去哪家。' },
+          { name:'王味螺', desc:'永安路0122号。' },
+          { name:'牛魔王牛杂', desc:'' },
+          { name:'小香葱', desc:'桂林米粉，多家连锁。' },
+          { name:'马记石磨肠粉', desc:'' }
+        ]
+      }
     ]
   };
 
@@ -349,17 +401,43 @@
   photo.onerror = ()=>{ document.getElementById('figure').style.display='none'; };
   photo.src = CONFIG.photo;
 
+  const foodMap = document.getElementById('foodMapImg');
+  foodMap.onerror = ()=>{ document.getElementById('foodMapFig').style.display='none'; };
+  foodMap.src = CONFIG.foodMap;
+
   /* ---------- 美食卡（数据驱动） ---------- */
   const foodList = document.getElementById('foodList');
-  (CONFIG.foods || []).forEach(f=>{
-    const card = document.createElement('div');
-    card.className = 'food';
-    card.innerHTML = '<div class="food-h"><span class="food-name"></span><span class="food-tag"></span></div><p class="food-desc"></p>';
-    card.querySelector('.food-name').textContent = f.name;
-    card.querySelector('.food-desc').textContent = f.desc;
-    const tag = card.querySelector('.food-tag');
-    if(f.tag){ tag.textContent = f.tag; } else { tag.style.display = 'none'; }
-    foodList.appendChild(card);
+  (CONFIG.foods || []).forEach(g=>{
+    const grp = document.createElement('div');
+    grp.className = 'fgroup';
+    const h = document.createElement('div');
+    h.className = 'fgroup-h';
+    const gname = document.createElement('span');
+    gname.textContent = g.group;
+    h.appendChild(gname);
+    if(g.note){
+      const gn = document.createElement('span');
+      gn.className = 'gn';
+      gn.textContent = g.note;
+      h.appendChild(gn);
+    }
+    grp.appendChild(h);
+    (g.items || []).forEach(it=>{
+      const item = document.createElement('div');
+      item.className = 'fitem';
+      const nm = document.createElement('div');
+      nm.className = 'nm';
+      nm.textContent = it.name;
+      item.appendChild(nm);
+      if(it.desc){
+        const ds = document.createElement('div');
+        ds.className = 'ds';
+        ds.textContent = it.desc;
+        item.appendChild(ds);
+      }
+      grp.appendChild(item);
+    });
+    foodList.appendChild(grp);
   });
 
   /* ---------- Toast ---------- */
@@ -419,6 +497,35 @@
     },{threshold:.18});
     reveals.forEach(el=>io.observe(el));
   }
+
+  /* ---------- 图片点击放大 ---------- */
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbScroll = lb.querySelector('.lb-scroll');
+  function openLightbox(src, alt){
+    if(!src) return;
+    lbImg.src = src; lbImg.alt = alt || '';
+    lb.classList.add('open'); lb.classList.remove('zoomed');
+    lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    lb.classList.remove('open','zoomed');
+    lb.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    lbImg.removeAttribute('src');
+  }
+  lbScroll.addEventListener('click', closeLightbox);
+  document.getElementById('lbClose').addEventListener('click', (e)=>{ e.stopPropagation(); closeLightbox(); });
+  lbImg.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    lb.classList.toggle('zoomed');
+    if(lb.classList.contains('zoomed')){ lbScroll.scrollTop = 0; lbScroll.scrollLeft = (lbScroll.scrollWidth - lbScroll.clientWidth) / 2; }
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
+  [document.getElementById('photoImg'), document.getElementById('foodMapImg')].forEach(img=>{
+    if(img){ img.addEventListener('click', ()=>openLightbox(img.currentSrc || img.src, img.alt)); }
+  });
 </script>
 </body>
 </html>
