@@ -2,284 +2,290 @@
 <!--
   ┌─────────────────────────────────────────────────────────────┐
   │  使用说明（宾客看不到，只有你编辑时能看到）                    │
-  │  只需改下面 <script> 里 CONFIG：                              │
-  │    groom / bride  →  新人姓名                                  │
-  │    date / lunar   →  公历 / 农历日期                           │
-  │    address        →  婚礼酒店地址（用于复制 + 一键导航）       │
-  │    phone          →  联系电话                                  │
-  │  改完双击预览；发给亲友直接发这个 .html 文件即可。            │
+  │  改下面 <script> 里 CONFIG：                                  │
+  │    新人 / 日期 / 酒店 / 导航链接 / 电话 / 配图                 │
+  │    foods：美食推荐数组，{name 菜名, tag 标签, desc 一句话}    │
+  │            想加菜就在数组里加一项；tag 留空就不显示           │
+  │  ★ 美食待替换为你们的真实合集 ★                              │
+  │  上传时：index.html + 照片(couple.jpg) 一起传。              │
   └─────────────────────────────────────────────────────────────┘
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jacky & May 的婚礼 · 来北流</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f7f3ea">
+<title>婚礼宾客指南 · Jacky & May</title>
 <style>
   :root{
-    --paper:#f8f1e7;--card:#fffdf8;--ink:#3a2622;--muted:#a08b7c;--line:#ecdfce;
-    --red:#a8322e;--red-dark:#8a2723;--red-tint:#f7e7e2;
-    --gold:#c2993f;--gold-soft:#d8b86a;--shadow:0 12px 34px rgba(138,39,35,.16);
+    --paper:#f7f3ea; --card:#fffdf9; --ink:#2a2520; --ink-soft:#6e655a;
+    --muted:#a59a89; --line:#e8e1d4; --line-soft:#efe9dd;
+    --accent:#a64a40; --accent-deep:#8a3a32; --accent-tint:#f2e6e2;
+    --serif:"Songti SC","STSong","SimSun",serif;
+    --name:"Didot","Bodoni 72","Baskerville","Hoefler Text",Georgia,"Times New Roman",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    --shadow:0 10px 30px rgba(42,37,32,.08);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
-    background:var(--paper);color:var(--ink);line-height:1.65;padding:0 0 48px;
+    font-family:var(--sans); color:var(--ink); line-height:1.7;
+    background:var(--paper); padding:0 0 calc(40px + env(safe-area-inset-bottom));
+    color-scheme:light;
   }
-  .wrap{max-width:560px;margin:0 auto;background:var(--paper)}
+  .wrap{max-width:480px;margin:0 auto;position:relative}
+  .topbar{height:3px;background:var(--accent)}
 
-  /* ---------- Hero ---------- */
-  .hero{
-    position:relative;text-align:center;color:#fff;overflow:hidden;
-    background:linear-gradient(160deg,#b8403a 0%,var(--red) 55%,var(--red-dark) 100%);
-    padding:40px 24px 92px;
+  .reveal{opacity:0;transform:translateY(14px)}
+  .reveal.is-in{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1 !important;transform:none !important;transition:none !important}
   }
-  .hxi{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);
-    font-size:220px;line-height:1;color:#fff;opacity:.06;pointer-events:none;
-    font-family:"Songti SC","STSong",serif;
-  }
-  .hero .rel{position:relative;z-index:2}
-  .flourish{width:120px;height:14px;margin:0 auto 14px;display:block}
-  .hero .we{font-size:14px;letter-spacing:.42em;text-indent:.42em;opacity:.9;margin-bottom:14px}
-  .names{
-    font-family:"Songti SC","STSong",Georgia,serif;font-weight:700;font-size:40px;line-height:1.15;
-    letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:18px;
-  }
-  .names .heart{font-size:22px;color:var(--gold-soft);transform:translateY(-2px)}
-  .date{
-    margin:16px auto 6px;font-size:15px;letter-spacing:.06em;
-    display:inline-flex;align-items:center;gap:10px;
-  }
-  .date::before,.date::after{content:"";width:26px;height:1px;background:rgba(255,255,255,.45)}
-  .lunar{font-size:13px;letter-spacing:.2em;text-indent:.2em;color:var(--gold-soft);
-    font-family:"Songti SC","STSong",serif;margin-bottom:14px}
-  .chip-loc{
-    display:inline-flex;align-items:center;gap:6px;font-size:13px;letter-spacing:.06em;
-    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
-    padding:5px 12px;border-radius:999px;
-  }
-  .hero p.lead{font-size:14.5px;opacity:.92;margin:16px auto 0;max-width:26em}
-  .hills{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:80px;display:block;z-index:1}
 
-  /* ---------- 婚礼地点卡 ---------- */
-  .addr{
-    margin:-64px 18px 0;position:relative;z-index:3;background:var(--card);border-radius:18px;
-    box-shadow:var(--shadow);padding:18px;border:1px solid var(--line);border-top:3px solid var(--gold);
+  /* ---------- 首屏入场动画 ---------- */
+  @keyframes barIn{to{transform:scaleX(1)}}
+  @keyframes upIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes chIn{to{opacity:1;transform:none;filter:blur(0)}}
+  @media (prefers-reduced-motion:no-preference){
+    .topbar{transform:scaleX(0);transform-origin:left;animation:barIn .7s cubic-bezier(.16,1,.3,1) forwards}
+    .kicker{opacity:0;animation:upIn .8s cubic-bezier(.16,1,.3,1) .15s both}
+    .names .ch{opacity:0;transform:translateY(.55em);filter:blur(5px);animation:chIn .62s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(.45s + var(--i) * .045s)}
+    .meta{opacity:0;animation:upIn .8s cubic-bezier(.16,1,.3,1) .95s both}
+    .intro{opacity:0;animation:upIn .8s cubic-bezier(.16,1,.3,1) 1.12s both}
   }
-  .addr .k{font-size:12px;color:var(--gold);letter-spacing:.16em;font-weight:700}
-  .addr .v{font-size:17px;font-weight:600;margin:5px 0 14px;word-break:break-all}
-  .addr-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+  /* ---------- 抬头 ---------- */
+  .head{text-align:center;padding:40px 30px 6px}
+  .kicker{font-size:12px;letter-spacing:.42em;text-indent:.42em;color:var(--accent);font-weight:600;margin-bottom:20px}
+  .names{font-family:var(--name);font-size:32px;font-weight:600;letter-spacing:.02em}
+  .names .amp{color:var(--accent);font-weight:400;margin:0 .28em}
+  .names .ch{display:inline-block}
+  .meta{margin-top:13px;font-family:var(--serif);color:var(--ink-soft);font-size:15px;letter-spacing:.06em}
+  .meta .wk{color:var(--accent);margin-right:.5em}
+  .meta .ln{color:var(--muted);font-size:12.5px;letter-spacing:.12em;margin-top:5px}
+  .intro{margin:18px auto 0;max-width:23em;font-size:14px;line-height:1.85;color:var(--ink-soft)}
+
+  /* ---------- 配图 ---------- */
+  .figure{margin:24px 22px 0}
+  .figure img{width:100%;display:block;border-radius:12px;border:1px solid var(--line);box-shadow:var(--shadow)}
+
+  /* ---------- 区块 ---------- */
+  .sec{padding:34px 24px 0}
+  .seclabel{
+    display:flex;align-items:center;gap:12px;margin-bottom:16px;
+    font-family:var(--serif);color:var(--accent);font-size:14px;letter-spacing:.3em;text-indent:.3em;
+  }
+  .seclabel::before,.seclabel::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* ---------- 地点 / 住宿 ---------- */
+  .venue{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(42,37,32,.05)}
+  .venue .name{text-align:center;font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.04em}
+  .venue .addr{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:12.5px;color:var(--muted);letter-spacing:.04em}
+  .addr-copy{border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);font-family:inherit;font-size:11.5px;font-weight:600;padding:3px 11px;border-radius:999px;cursor:pointer;transition:transform .12s ease}
+  .addr-copy:active{transform:scale(.95)}
+  .stay{margin-top:13px;font-size:13px;color:var(--accent-deep);background:var(--accent-tint);border-radius:9px;padding:10px 12px;text-align:center;line-height:1.7}
+  .acts{display:flex;gap:9px;margin-top:13px}
   .btn{
-    flex:1 1 auto;min-width:96px;text-align:center;cursor:pointer;border:none;border-radius:12px;
-    padding:11px 12px;font-size:14.5px;font-weight:600;font-family:inherit;text-decoration:none;
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    transition:transform .08s ease,filter .15s ease;
+    flex:1;text-align:center;cursor:pointer;border:1px solid var(--line);border-radius:10px;
+    padding:11px 6px;font-size:13.5px;font-weight:600;font-family:inherit;text-decoration:none;
+    color:var(--ink);background:var(--paper);display:inline-flex;align-items:center;justify-content:center;
+    transition:transform .12s ease,background .2s ease;
   }
-  .btn:active{transform:translateY(1px)}
-  .btn-copy{background:var(--red-tint);color:var(--red-dark)}
-  .btn-amap{background:var(--red);color:#fff}
-  .btn-amap:hover{filter:brightness(1.07)}
-  .btn-baidu{background:#f3ead4;color:#8a6a1f}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fdf3f0}
 
-  /* ---------- Tabs ---------- */
-  .section{margin:26px 18px 0}
-  .tabs{
-    display:flex;gap:8px;background:#efe2cf;border-radius:14px;padding:6px;
-    position:sticky;top:10px;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.05);
+  /* ---------- 主切换：出行 / 美食（实色分段控件） ---------- */
+  .switch{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:6px;box-shadow:0 4px 14px rgba(42,37,32,.04)}
+  .seg{
+    flex:1;border:none;background:transparent;cursor:pointer;font-family:var(--serif);
+    font-size:17px;letter-spacing:.2em;text-indent:.2em;color:var(--muted);padding:12px 0;border-radius:9px;
+    transition:background .2s ease,color .2s ease;
   }
+  .seg[aria-selected="true"]{background:var(--accent);color:#fdf3f0}
+  .mpanel{display:none;padding-top:20px}
+  .mpanel.on{display:block;animation:fade .4s cubic-bezier(.16,1,.3,1)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.mpanel.on{animation:none}}
+
+  /* ---------- 次级：飞机/动车/汽车（下划线） ---------- */
+  .tabs{display:flex;border-bottom:1px solid var(--line)}
   .tab{
-    flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:15px;
-    font-weight:600;color:var(--muted);padding:10px 4px;border-radius:10px;display:flex;
-    flex-direction:column;align-items:center;gap:2px;transition:all .18s ease;
+    flex:1;border:none;background:transparent;cursor:pointer;font-family:var(--serif);
+    font-size:16px;letter-spacing:.24em;text-indent:.24em;color:var(--muted);
+    padding:11px 0 12px;position:relative;transition:color .2s ease;
   }
-  .tab .ico{font-size:19px}
-  .tab.active{background:var(--card);color:var(--red-dark);box-shadow:0 3px 10px rgba(0,0,0,.09)}
-  .panel{display:none;animation:fade .28s ease}
-  .panel.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .card{
-    background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:14px;
-    padding:18px 18px 6px;box-shadow:0 6px 18px rgba(138,39,35,.07);
+  .tab[aria-selected="true"]{color:var(--accent-deep)}
+  .tab[aria-selected="true"]::after{content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);width:28px;height:2px;background:var(--accent);border-radius:2px}
+  .panel{display:none;padding-top:16px}
+  .panel.on{display:block;animation:fade .35s cubic-bezier(.16,1,.3,1)}
+  @media (prefers-reduced-motion:reduce){.panel.on{animation:none}}
+  .route{display:flex;gap:14px;padding:14px 0}
+  .route + .route{border-top:1px solid var(--line-soft)}
+  .route .mk{
+    flex:0 0 25px;width:25px;height:25px;border-radius:50%;border:1.5px solid var(--accent);
+    color:var(--accent-deep);background:var(--card);font-family:var(--serif);font-size:13px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;
   }
-  .card > h3{font-size:16px;color:var(--red-dark);margin-bottom:4px}
-  .card > .sub{font-size:13px;color:var(--muted);margin-bottom:8px}
-  .step{display:flex;gap:14px;padding:14px 0;border-top:1px dashed var(--line)}
-  .step:first-of-type{border-top:none}
-  .step .num{
-    flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;
-    font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px;
-  }
-  .step .num.alt{background:var(--gold)}
-  .step .body{flex:1}
-  .step .body b{font-size:15px}
-  .step .body p{font-size:14px;color:#5a4b44;margin-top:2px}
-  .tag{
-    display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:1px 7px;
-    margin:6px 6px 0 0;background:var(--red-tint);color:var(--red-dark);
-  }
-  .tag.warn{background:#f6ecd2;color:#8a6a1f}
-  .tip{
-    margin:6px 0 16px;font-size:13.5px;color:#6a5a50;background:#fbf4e6;
-    border-left:3px solid var(--gold);padding:9px 12px;border-radius:0 8px 8px 0;
-  }
+  .route b{font-size:15px;font-weight:600}
+  .route p{font-size:13.5px;color:var(--ink-soft);margin-top:3px;line-height:1.75}
+  .note{margin:14px 0 4px;font-size:13px;color:var(--ink-soft);line-height:1.8;background:#f3ede1;border-left:2px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 13px}
+  .note span{color:var(--accent);font-weight:600;margin-right:.5em}
+
+  /* ---------- 美食 ---------- */
+  .food{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:0 4px 14px rgba(42,37,32,.04)}
+  .food + .food{margin-top:11px}
+  .food-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .food-name{font-family:var(--serif);font-size:16.5px;font-weight:600;letter-spacing:.03em}
+  .food-tag{flex:0 0 auto;font-size:11.5px;color:var(--accent);background:var(--accent-tint);padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .food-desc{font-size:13.5px;color:var(--ink-soft);margin-top:6px;line-height:1.7}
+  .foodnote{margin-top:14px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.7}
 
   /* ---------- 联系 ---------- */
-  .contact{
-    margin:30px 18px 0;background:var(--red-dark);color:#fff;border-radius:18px;
-    padding:22px 20px;box-shadow:var(--shadow);text-align:center;
-  }
-  .contact h3{font-size:17px;margin-bottom:4px}
-  .contact .note{font-size:13.5px;opacity:.85;margin-bottom:18px}
-  .crow{display:flex;align-items:center;justify-content:center;gap:14px}
-  .crow .val{font-size:22px;font-weight:700;letter-spacing:.04em}
-  .mini{
-    border:none;background:var(--gold);color:#3a2622;border-radius:9px;padding:9px 18px;
-    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;white-space:nowrap;
-  }
-  .sign{margin-top:18px;font-family:"Songti SC","STSong",serif;font-size:15px;letter-spacing:.1em;opacity:.92}
-  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:26px;padding:0 24px}
+  .contact{text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:var(--shadow)}
+  .contact .tip{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  .contact .num{font-family:var(--serif);font-size:24px;letter-spacing:.06em;font-weight:600}
+  .contact .call{display:inline-block;margin-top:14px;background:var(--accent);color:#fdf3f0;border-radius:10px;padding:10px 30px;font-size:14px;font-weight:700;text-decoration:none;transition:transform .12s ease}
+  .contact .call:active{transform:scale(.97)}
+
+  /* ---------- 结尾 ---------- */
+  footer{text-align:center;margin-top:30px;padding:0 24px;color:var(--ink-soft)}
+  footer .bye{font-family:var(--serif);font-size:14px;letter-spacing:.1em}
+  footer .sig{font-family:var(--name);font-size:18px;color:var(--accent);letter-spacing:.06em;margin-top:12px}
+  footer .sig::before,footer .sig::after{content:"";display:inline-block;width:16px;height:1px;background:var(--line);vertical-align:middle;margin:0 11px}
 
   /* ---------- Toast ---------- */
-  #toast{
-    position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);background:#3a2622;color:#fff;
-    padding:11px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;
-    transition:all .25s ease;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);
-  }
+  #toast{position:fixed;left:50%;bottom:calc(34px + env(safe-area-inset-bottom));transform:translate(-50%,18px);background:var(--ink);color:#fdf6e9;padding:11px 22px;border-radius:999px;font-size:13.5px;letter-spacing:.04em;opacity:0;pointer-events:none;transition:all .26s cubic-bezier(.16,1,.3,1);z-index:50;box-shadow:0 10px 28px rgba(0,0,0,.24)}
   #toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar"></div>
 
-  <!-- ===== HERO ===== -->
-  <header class="hero">
-    <div class="hxi">囍</div>
-    <div class="rel">
-      <svg class="flourish" viewBox="0 0 120 14" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 7 H46 M74 7 H118" stroke="#d8b86a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <path d="M60 2 C56 5 56 9 60 12 C64 9 64 5 60 2 Z" fill="#d8b86a"/>
-        <circle cx="50" cy="7" r="1.6" fill="#d8b86a"/><circle cx="70" cy="7" r="1.6" fill="#d8b86a"/>
-      </svg>
-      <div class="we">我 们 结 婚 啦</div>
-      <div class="names"><span id="groom"></span><span class="heart">❤</span><span id="bride"></span></div>
-      <div class="date" id="dateLine"></div>
-      <div class="lunar" id="lunarLine"></div>
-      <div><span class="chip-loc">📍 广西 · 北流</span></div>
-      <p class="lead">谢谢你愿意为我们跑这一趟。下面是来婚礼酒店的三种走法——飞机、动车、汽车都行，多数都先到玉林，再约半小时车程到北流。到了实在找不着，停下打我们电话。</p>
+  <!-- ===== 抬头 ===== -->
+  <header class="head">
+    <div class="kicker">婚 礼 宾 客 指 南</div>
+    <div class="names"><span id="groom"></span><span class="amp ch" id="amp">&amp;</span><span id="bride"></span></div>
+    <div class="meta">
+      <span class="wk" id="weekday"></span><span id="date"></span>
+      <div class="ln" id="lunar"></div>
     </div>
-    <svg class="hills" viewBox="0 0 560 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,80 L0,48 Q40,16 80,42 Q120,10 165,40 Q210,6 255,36 Q300,12 350,42 Q400,14 450,40 Q500,16 545,38 L560,36 L560,80 Z" fill="#7a221e"/>
-      <path d="M0,80 L0,60 Q60,36 130,56 Q200,34 280,58 Q360,36 440,56 Q500,42 560,56 L560,80 Z" fill="#f8f1e7"/>
-    </svg>
+    <p class="intro">谢谢你愿意为我们跑这一趟。这页备了来北流的路径和本地的美食。住宿不用操心，已经给你安排好啦～</p>
   </header>
 
-  <!-- ===== 婚礼地点 ===== -->
-  <div class="addr">
-    <div class="k">婚 礼 地 点</div>
-    <div class="v" id="addrText"></div>
-    <div class="addr-btns">
-      <button class="btn btn-copy" id="copyAddr">📋 复制地址</button>
-      <a class="btn btn-amap" id="navAmap" target="_blank" rel="noopener">🗺️ 高德导航</a>
-      <a class="btn btn-baidu" id="navBaidu" target="_blank" rel="noopener">百度地图</a>
-    </div>
-  </div>
+  <!-- ===== 配图 ===== -->
+  <figure class="figure reveal" id="figure">
+    <img id="photoImg" alt="Jacky 与 May">
+  </figure>
 
-  <!-- ===== Tabs ===== -->
-  <div class="section">
-    <div class="tabs">
-      <button class="tab active" data-tab="plane"><span class="ico">✈️</span>飞机</button>
-      <button class="tab" data-tab="train"><span class="ico">🚄</span>动车</button>
-      <button class="tab" data-tab="bus"><span class="ico">🚌</span>汽车</button>
-    </div>
-
-    <!-- 飞机 -->
-    <div class="panel active" id="plane">
-      <div class="card">
-        <h3>✈️ 坐飞机来</h3>
-        <p class="sub">先看出发城市有没有直飞玉林；没有就飞南宁中转。落地都在玉林，再约半小时到北流。</p>
-        <div class="step">
-          <div class="num">A</div>
-          <div class="body">
-            <b>有直飞 → 玉林福绵机场（YLX）</b>
-            <p>落地后打车 / 网约车到北流国际大酒店，约 30–40 分钟车程，导航搜上面地址即可。</p>
-            <span class="tag warn">直飞航线较少，订票前先查一下</span>
-          </div>
-        </div>
-        <div class="step">
-          <div class="num alt">B</div>
-          <div class="body">
-            <b>没有直飞 → 飞南宁吴圩国际机场中转</b>
-            <p>南宁机场坐机场大巴 / 地铁到南宁东站，换「南宁→玉林」动车（约 1 小时）到玉林北站，再打车到北流酒店（约半小时）。</p>
-            <span class="tag">中转方案最稳，班次多</span>
-          </div>
-        </div>
-        <p class="tip">💡 到了机场先别急着出来，发个定位给我们，远程帮你看怎么打车最省。</p>
+  <!-- ===== 地点 / 住宿 ===== -->
+  <section class="sec">
+    <div class="seclabel reveal">地 点 与 住 宿</div>
+    <div class="venue reveal">
+      <div class="name" id="venueName"></div>
+      <div class="addr">
+        <span id="venueAddr"></span>
+        <button class="addr-copy" id="copyAddr">复制</button>
+      </div>
+      <div class="stay">住宿已为你安排在婚礼酒店内，到了直接办入住，不用另外订房。</div>
+      <div class="acts">
+        <a class="btn" id="navAmap" target="_blank" rel="noopener">高德地图</a>
+        <a class="btn" id="navBaidu" target="_blank" rel="noopener">百度地图</a>
       </div>
     </div>
+  </section>
 
-    <!-- 动车 -->
-    <div class="panel" id="train">
-      <div class="card">
-        <h3>🚄 坐动车 / 高铁来</h3>
-        <p class="sub">高铁到玉林北站再打车到北流；坐普速火车可直接到北流站，离酒店更近。</p>
-        <div class="step">
-          <div class="num">1</div>
-          <div class="body">
-            <b>高铁：买票买到「玉林北」</b>
-            <p>南玉高铁已通车，南宁到玉林约 1 小时。外省出发大多需在南宁 / 南宁东换乘一次。</p>
-            <span class="tag warn">想离酒店更近，可坐普速火车买到「北流站」</span>
+  <!-- ===== 出行 / 美食（主切换） ===== -->
+  <section class="sec">
+    <div class="switch reveal" role="tablist">
+      <button class="seg" role="tab" aria-selected="true"  data-main="travel">出 行</button>
+      <button class="seg" role="tab" aria-selected="false" data-main="food">美 食</button>
+    </div>
+
+    <!-- 出行面板 -->
+    <div class="mpanel on" id="m-travel" role="tabpanel">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true"  data-tab="plane">飞 机</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="train">动 车</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="bus">汽 车</button>
+      </div>
+
+      <div class="panel on" id="plane" role="tabpanel">
+        <div class="route">
+          <div class="mk">甲</div>
+          <div>
+            <b>有直飞，飞玉林福绵机场</b>
+            <p>落地打车或网约车到北流国际大酒店，约三四十分钟车程，导航搜上面地址就行。直飞航线不多，订票前先查一下出发城市有没有。</p>
           </div>
         </div>
-        <div class="step">
-          <div class="num">2</div>
-          <div class="body">
+        <div class="route">
+          <div class="mk">乙</div>
+          <div>
+            <b>没直飞，飞南宁吴圩机场中转</b>
+            <p>南宁机场坐机场大巴或地铁到南宁东站，换乘南宁到玉林的动车（约一小时）到玉林北站，再打车到酒店，约半小时。这条最稳，班次多。</p>
+          </div>
+        </div>
+        <p class="note"><span>提示</span>到了机场先别急着出来，发个定位给我们，帮你看怎么打车最省。</p>
+      </div>
+
+      <div class="panel" id="train" role="tabpanel">
+        <div class="route">
+          <div class="mk">一</div>
+          <div>
+            <b>高铁买到「玉林北」</b>
+            <p>南玉高铁已通车，南宁到玉林约一小时。外省出发大多要在南宁或南宁东换乘一次。想离酒店更近，也可以坐普速火车买到「北流站」。</p>
+          </div>
+        </div>
+        <div class="route">
+          <div class="mk">二</div>
+          <div>
             <b>出站打车到北流酒店</b>
-            <p>玉林北站出站口就有出租 / 网约车，到北流国际大酒店约 30–40 分钟；直接报「北流国际大酒店」给司机或用导航。</p>
+            <p>玉林北站出站口就有出租和网约车，到北流国际大酒店约三四十分钟。直接报「北流国际大酒店」给司机，或用导航。</p>
           </div>
         </div>
-        <p class="tip">💡 快到站时给我们发个消息，方便的话过去接你。</p>
+        <p class="note"><span>提示</span>快到站时给我们发个消息，方便的话过去接你。</p>
       </div>
-    </div>
 
-    <!-- 汽车 -->
-    <div class="panel" id="bus">
-      <div class="card">
-        <h3>🚌 坐汽车 / 自驾来</h3>
-        <p class="sub">自驾直接导航到酒店；坐大巴优先买到北流，离酒店很近。</p>
-        <div class="step">
-          <div class="num">1</div>
-          <div class="body">
+      <div class="panel" id="bus" role="tabpanel">
+        <div class="route">
+          <div class="mk">一</div>
+          <div>
             <b>自驾</b>
             <p>导航直接搜「北流国际大酒店」走高速即可，点上面「高德导航」一键开路线。</p>
           </div>
         </div>
-        <div class="step">
-          <div class="num alt">2</div>
-          <div class="body">
+        <div class="route">
+          <div class="mk">二</div>
+          <div>
             <b>坐长途大巴</b>
-            <p>买到「北流汽车站」的票最方便，下车打车几分钟到酒店；只有到玉林的车，就到玉林汽车总站再转。</p>
-            <span class="tag warn">夜里大巴到得晚，提前跟我们说一声</span>
+            <p>买到「北流汽车站」的票最方便，下车打车几分钟到酒店；只有到玉林的车，就到玉林汽车总站再转。夜里大巴到得晚，提前跟我们说一声。</p>
           </div>
         </div>
-        <p class="tip">💡 自驾快到了打个电话，酒店门口我们出来接，免得最后一段绕路。</p>
+        <p class="note"><span>提示</span>自驾快到了打个电话，酒店门口我们出来接，免得最后一段绕路。</p>
       </div>
     </div>
-  </div>
 
-  <!-- ===== 联系方式 ===== -->
-  <div class="contact">
-    <h3>📞 联系我们</h3>
-    <p class="note">哪一步卡住了别硬找——停在原地打电话，我们来接你。</p>
-    <div class="crow">
-      <span class="val" id="phoneVal"></span>
-      <a class="mini" id="callBtn">拨打</a>
+    <!-- 美食面板 -->
+    <div class="mpanel" id="m-food" role="tabpanel">
+      <div id="foodList"></div>
+      <p class="foodnote">具体哪家最地道，到了问我们，给你指路或带你去。</p>
     </div>
-    <div class="sign" id="signLine"></div>
-  </div>
+  </section>
 
-  <footer>路上注意安全，等你来北流喝我们的喜酒 🍷</footer>
+  <!-- ===== 联系 ===== -->
+  <section class="sec">
+    <div class="seclabel reveal">联 系 我 们</div>
+    <div class="contact reveal">
+      <div class="tip">哪一步卡住了？联系我们～</div>
+      <div class="num" id="phoneVal"></div>
+      <a class="call" id="callBtn">拨打电话</a>
+    </div>
+  </section>
+
+  <footer class="reveal">
+    <div class="bye">路上注意安全，等你来北流喝喜酒。</div>
+    <div class="sig" id="sig"></div>
+  </footer>
 </div>
 
 <div id="toast"></div>
@@ -289,63 +295,130 @@
      只改这里：CONFIG
      ============================================================ */
   const CONFIG = {
-    groom:   '陈家健',
-    bride:   '陈玫伶',
-    date:    '2026年10月3日 · 星期六',
-    lunar:   '农历八月廿三',
+    groom:   'Jacky',
+    bride:   'May',
+    weekday: '星期六',
+    date:    '2026年10月3日',
+    lunar:   '农历丙午年八月廿三',
+    venue:   '北流国际大酒店',
     address: '广西北流市国际大酒店',
-    phone:   '18701832058'
+    amapUrl: 'https://ditu.amap.com/place/B03070NBE6',
+    baiduUrl:'https://map.baidu.com/poi/%E5%8C%97%E6%B5%81%E5%9B%BD%E9%99%85%E5%A4%A7%E9%85%92%E5%BA%97(%E4%B8%87%E8%BE%BE%E5%B9%BF%E5%9C%BA%E5%BA%97)/@12284678.04,2580707.16,19z?uid=d63dfa3ae94c383fabf0cd72&ugc_type=3&ugc_ver=1&device_ratio=1&compat=1&en_uid=d63dfa3ae94c383fabf0cd72&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl',
+    phone:   '18701832058',
+    photo:   'couple.jpg',
+    // ★ 美食待替换为你们的真实合集 ★
+    foods: [
+      { name:'玉林牛巴',     tag:'招牌', desc:'玉林一带最有名的牛肉小吃，咸香入味、有嚼劲，配米粉或下酒都好。' },
+      { name:'北流卷粉',     tag:'早餐', desc:'本地米制卷粉，皮薄馅足、淋上酱汁，早上街边最常见的一口。' },
+      { name:'玉林牛腩粉',   tag:'粉面', desc:'软烂牛腩盖在米粉上，汤头浓，本地人的日常一碗。' },
+      { name:'桂东南白切鸡', tag:'家常', desc:'皮黄肉嫩，蘸沙姜葱油，广西餐桌上的硬菜。' },
+      { name:'玉林云吞',     tag:'小吃', desc:'皮薄馅大，清汤或干捞都对味。' }
+    ]
   };
 
-  /* ---------- 注入内容 ---------- */
-  document.getElementById('groom').textContent    = CONFIG.groom;
-  document.getElementById('bride').textContent    = CONFIG.bride;
-  document.getElementById('dateLine').textContent = CONFIG.date;
-  document.getElementById('lunarLine').textContent= CONFIG.lunar;
-  document.getElementById('addrText').textContent = CONFIG.address;
-  document.getElementById('phoneVal').textContent = CONFIG.phone;
-  document.getElementById('callBtn').href         = 'tel:' + CONFIG.phone;
-  document.getElementById('signLine').textContent = '—— ' + CONFIG.groom + ' & ' + CONFIG.bride;
+  /* ---------- 注入文本 ---------- */
+  const set = (id, v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
 
-  const q = encodeURIComponent(CONFIG.address);
-  document.getElementById('navAmap').href  = 'https://uri.amap.com/search?keyword=' + q + '&src=wedding';
-  document.getElementById('navBaidu').href = 'https://map.baidu.com/search/' + q;
+  // 名字逐字拆分，用于首屏逐字入场动画
+  let _chi = 0;
+  function fillChars(el, text){
+    el.textContent = '';
+    for(const c of text){
+      const s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = (c === ' ') ? ' ' : c;
+      s.style.setProperty('--i', _chi++);
+      el.appendChild(s);
+    }
+  }
+  fillChars(document.getElementById('groom'), CONFIG.groom);
+  document.getElementById('amp').style.setProperty('--i', _chi++);
+  fillChars(document.getElementById('bride'), CONFIG.bride);
+  set('weekday',CONFIG.weekday); set('date',CONFIG.date); set('lunar',CONFIG.lunar);
+  set('venueName',CONFIG.venue); set('venueAddr',CONFIG.address);
+  set('phoneVal',CONFIG.phone);
+  set('sig',CONFIG.groom + ' & ' + CONFIG.bride);
+  document.getElementById('callBtn').href = 'tel:' + CONFIG.phone;
+
+  const qa = encodeURIComponent(CONFIG.address);
+  document.getElementById('navAmap').href  = CONFIG.amapUrl  || ('https://uri.amap.com/search?keyword=' + qa + '&src=wedding');
+  document.getElementById('navBaidu').href = CONFIG.baiduUrl || ('https://map.baidu.com/search/' + qa);
+
+  /* ---------- 配图 ---------- */
+  const photo = document.getElementById('photoImg');
+  photo.onerror = ()=>{ document.getElementById('figure').style.display='none'; };
+  photo.src = CONFIG.photo;
+
+  /* ---------- 美食卡（数据驱动） ---------- */
+  const foodList = document.getElementById('foodList');
+  (CONFIG.foods || []).forEach(f=>{
+    const card = document.createElement('div');
+    card.className = 'food';
+    card.innerHTML = '<div class="food-h"><span class="food-name"></span><span class="food-tag"></span></div><p class="food-desc"></p>';
+    card.querySelector('.food-name').textContent = f.name;
+    card.querySelector('.food-desc').textContent = f.desc;
+    const tag = card.querySelector('.food-tag');
+    if(f.tag){ tag.textContent = f.tag; } else { tag.style.display = 'none'; }
+    foodList.appendChild(card);
+  });
 
   /* ---------- Toast ---------- */
-  let toastTimer;
+  let tt;
   function toast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),1800);
   }
 
-  /* ---------- 复制（带降级方案） ---------- */
-  function copy(text, okMsg){
-    const done = ()=>toast(okMsg || '已复制');
+  /* ---------- 复制地址 ---------- */
+  function copyText(text){
+    const ok=()=>toast('复制成功');
     if(navigator.clipboard && window.isSecureContext){
-      navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text, done));
-    }else{ fallback(text, done); }
+      navigator.clipboard.writeText(text).then(ok).catch(()=>fb(text,ok));
+    }else{ fb(text,ok); }
   }
-  function fallback(text, done){
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); done(); }
-    catch(e){ toast('复制失败，请长按手动复制'); }
+  function fb(text,ok){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand('copy'); ok(); }catch(e){ toast('复制失败，请长按手动复制'); }
     document.body.removeChild(ta);
   }
-  document.getElementById('copyAddr').addEventListener('click', ()=>copy(CONFIG.address, '地址已复制，去地图粘贴即可'));
+  document.getElementById('copyAddr').addEventListener('click', ()=>copyText(CONFIG.address));
 
-  /* ---------- Tab 切换 ---------- */
-  document.querySelectorAll('.tab').forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
+  /* ---------- 主切换：出行 / 美食 ---------- */
+  const segs = document.querySelectorAll('.seg');
+  segs.forEach(seg=>{
+    seg.addEventListener('click',()=>{
+      segs.forEach(s=>s.setAttribute('aria-selected','false'));
+      seg.setAttribute('aria-selected','true');
+      document.getElementById('m-travel').classList.toggle('on', seg.dataset.main==='travel');
+      document.getElementById('m-food').classList.toggle('on', seg.dataset.main==='food');
     });
   });
+
+  /* ---------- 次级：飞机 / 动车 / 汽车 ---------- */
+  const tabs=document.querySelectorAll('.tab');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      tabs.forEach(t=>t.setAttribute('aria-selected','false'));
+      document.querySelectorAll('#m-travel .panel').forEach(p=>p.classList.remove('on'));
+      tab.setAttribute('aria-selected','true');
+      document.getElementById(tab.dataset.tab).classList.add('on');
+    });
+  });
+
+  /* ---------- 入场动效 ---------- */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveals = document.querySelectorAll('.reveal');
+  if(reduce || !('IntersectionObserver' in window)){
+    reveals.forEach(el=>el.classList.add('is-in'));
+  }else{
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    },{threshold:.18});
+    reveals.forEach(el=>io.observe(el));
+  }
 </script>
 </body>
 </html>
