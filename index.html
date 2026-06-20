@@ -164,7 +164,7 @@
   #toast.show{opacity:1;transform:translate(-50%,0)}
 
   /* ---------- 图片点击放大 ---------- */
-  .figure img,.foodmap img{cursor:zoom-in}
+  .foodmap img{cursor:zoom-in}
   #lightbox{position:fixed;inset:0;z-index:100;display:none;background:rgba(20,16,14,.94)}
   #lightbox.open{display:block}
   #lightbox .lb-scroll{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -317,7 +317,7 @@
     lunar:   '农历丙午年八月廿三',
     venue:   '北流国际大酒店',
     address: '广西北流市国际大酒店',
-    amapUrl: 'https://ditu.amap.com/place/B03070NBE6',
+    amapUrl: 'https://surl.amap.com/25NnBOZ1A0Ht',
     baiduUrl:'https://map.baidu.com/poi/%E5%8C%97%E6%B5%81%E5%9B%BD%E9%99%85%E5%A4%A7%E9%85%92%E5%BA%97(%E4%B8%87%E8%BE%BE%E5%B9%BF%E5%9C%BA%E5%BA%97)/@12284678.04,2580707.16,19z?uid=d63dfa3ae94c383fabf0cd72&ugc_type=3&ugc_ver=1&device_ratio=1&compat=1&en_uid=d63dfa3ae94c383fabf0cd72&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl',
     phone:   '18701832058',
     photo:   'couple.jpg',
@@ -523,9 +523,8 @@
     if(lb.classList.contains('zoomed')){ lbScroll.scrollTop = 0; lbScroll.scrollLeft = (lbScroll.scrollWidth - lbScroll.clientWidth) / 2; }
   });
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
-  [document.getElementById('photoImg'), document.getElementById('foodMapImg')].forEach(img=>{
-    if(img){ img.addEventListener('click', ()=>openLightbox(img.currentSrc || img.src, img.alt)); }
-  });
+  const _fm = document.getElementById('foodMapImg');
+  if(_fm){ _fm.addEventListener('click', ()=>openLightbox(_fm.currentSrc || _fm.src, _fm.alt)); }
 </script>
 </body>
 </html>
